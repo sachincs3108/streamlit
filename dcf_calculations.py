@@ -72,40 +72,83 @@ def fetch_screener_data(symbol):
             except ValueError:
                 data["FY24 PE"] = "Not a valid data"
 
-        compounded_sales_growth_table = None
-        for table in soup.find_all('table', class_='ranges-table'):
-            header = table.find('th', colspan="2")
-            if header and header.get_text(strip=True) == "Compounded Sales Growth":
-                compounded_sales_growth_table = table
-                break
+        # compounded_sales_growth_table = None
+        # for table in soup.find_all('table', class_='ranges-table'):
+        #     header = table.find('th', colspan="2")
+        #     if header and header.get_text(strip=True) == "Compounded Sales Growth":
+        #         compounded_sales_growth_table = table
+        #         break
 
-        # Check if the table was found
-        if compounded_sales_growth_table:
-            compounded_sales_growth = {}
-         # Define the periods we're looking for
-            periods = ["10 Years:", "5 Years:", "3 Years:", "TTM:"]
-            # Loop through each row in the table body
-            for row in compounded_sales_growth_table.find_all('tr'):
-                cells = row.find_all('td')
+        # # Check if the table was found
+        # if compounded_sales_growth_table:
+        #     compounded_sales_growth = {}
+        #  # Define the periods we're looking for
+        #     periods = ["10 Years:", "5 Years:", "3 Years:", "TTM:"]
+        #     # Loop through each row in the table body
+        #     for row in compounded_sales_growth_table.find_all('tr'):
+        #         cells = row.find_all('td')
 
-                # Check if the row has two cells and the first cell contains one of the periods we're looking for
-                if len(cells) == 2 and cells[0].get_text(strip=True) in periods:
-                    # Get the period name and its corresponding value
-                    period = cells[0].get_text(strip=True)
-                    value = cells[1].get_text(strip=True)
+        #         # Check if the row has two cells and the first cell contains one of the periods we're looking for
+        #         if len(cells) == 2 and cells[0].get_text(strip=True) in periods:
+        #             # Get the period name and its corresponding value
+        #             period = cells[0].get_text(strip=True)
+        #             value = cells[1].get_text(strip=True)
 
-                    # Store the result in the dictionary
-                    compounded_sales_growth[period] = value
-                    data[period] = value
+        #             # Store the result in the dictionary
+        #             compounded_sales_growth[period] = value
+        #             data[period] = value
 
-            # Output the results
-            print("Compounded Sales Growth:")
-            for period, value in compounded_sales_growth.items():
-                print(f"{period} {value}")
+        #     # Output the results
+        #     print("Compounded Sales Growth:")
+        #     for period, value in compounded_sales_growth.items():
+        #         print(f"{period} {value}")
 
-        else:
-            print("Table with 'Compounded Sales Growth' header not found.")
-        print("data:",data)
+        # else:
+        #     print("Table with 'Compounded Sales Growth' header not found.")
+        # print("data:",data)
+
+
+        # Find and extract "Compounded Sales Growth" and "Compound Profit Growth" tables
+        for growth_type in ["Compounded Sales Growth", "Compounded Profit Growth"]:
+            growth_table = None
+            for table in soup.find_all('table', class_='ranges-table'):
+                header = table.find('th', colspan="2")
+                if header and header.get_text(strip=True) == growth_type:
+                    growth_table = table
+                    break
+
+            # Check if the table was found
+            if growth_table:
+                growth_data = {}
+                # Define the periods we're looking for
+                periods = ["10 Years:", "5 Years:", "3 Years:", "TTM:"]
+        
+                # Loop through each row in the table body
+                for row in growth_table.find_all('tr'):
+                    cells = row.find_all('td')
+
+                    # Check if the row has two cells and the first cell contains one of the periods we're looking for
+                    if len(cells) == 2 and cells[0].get_text(strip=True) in periods:
+                        # Get the period name and its corresponding value
+                        period = cells[0].get_text(strip=True)
+                        value = cells[1].get_text(strip=True)
+
+                        # Store the result in the dictionary with a prefix for identification
+                        prefixed_period = f"{growth_type} {period}"
+                        growth_data[prefixed_period] = value
+                        data[prefixed_period] = value
+
+                # Output the results
+                print(f"{growth_type}:")
+                for period, value in growth_data.items():
+                    print(f"{period} {value}")
+
+            else:
+                print(f"Table with '{growth_type}' header not found.")
+
+        # Print the final data dictionary to verify
+        print("data:", data)
+
 
     except requests.RequestException as e:
         print(f"Error fetching consolidated data: {e}")
@@ -179,40 +222,83 @@ def fetch_screener_data(symbol):
             except ValueError:
                 data["FY24 PE"] = "Not a valid data"
 
-        compounded_sales_growth_table = None
-        for table in soup.find_all('table', class_='ranges-table'):
-            header = table.find('th', colspan="2")
-            if header and header.get_text(strip=True) == "Compounded Sales Growth":
-                compounded_sales_growth_table = table
-                break
+        # compounded_sales_growth_table = None
+        # for table in soup.find_all('table', class_='ranges-table'):
+        #     header = table.find('th', colspan="2")
+        #     if header and header.get_text(strip=True) == "Compounded Sales Growth":
+        #         compounded_sales_growth_table = table
+        #         break
 
-        # Check if the table was found
-        if compounded_sales_growth_table:
-            compounded_sales_growth = {}
-         # Define the periods we're looking for
-            periods = ["10 Years:", "5 Years:", "3 Years:", "TTM:"]
-            # Loop through each row in the table body
-            for row in compounded_sales_growth_table.find_all('tr'):
-                cells = row.find_all('td')
+        # # Check if the table was found
+        # if compounded_sales_growth_table:
+        #     compounded_sales_growth = {}
+        #  # Define the periods we're looking for
+        #     periods = ["10 Years:", "5 Years:", "3 Years:", "TTM:"]
+        #     # Loop through each row in the table body
+        #     for row in compounded_sales_growth_table.find_all('tr'):
+        #         cells = row.find_all('td')
 
-                # Check if the row has two cells and the first cell contains one of the periods we're looking for
-                if len(cells) == 2 and cells[0].get_text(strip=True) in periods:
-                    # Get the period name and its corresponding value
-                    period = cells[0].get_text(strip=True)
-                    value = cells[1].get_text(strip=True)
+        #         # Check if the row has two cells and the first cell contains one of the periods we're looking for
+        #         if len(cells) == 2 and cells[0].get_text(strip=True) in periods:
+        #             # Get the period name and its corresponding value
+        #             period = cells[0].get_text(strip=True)
+        #             value = cells[1].get_text(strip=True)
 
-                    # Store the result in the dictionary
-                    compounded_sales_growth[period] = value
-                    data[period] = value
+        #             # Store the result in the dictionary
+        #             compounded_sales_growth[period] = value
+        #             data[period] = value
 
-            # Output the results
-            print("Compounded Sales Growth:")
-            for period, value in compounded_sales_growth.items():
-                print(f"{period} {value}")
+        #     # Output the results
+        #     print("Compounded Sales Growth:")
+        #     for period, value in compounded_sales_growth.items():
+        #         print(f"{period} {value}")
 
-        else:
-            print("Table with 'Compounded Sales Growth' header not found.")
-        print("data:",data)
+        # else:
+        #     print("Table with 'Compounded Sales Growth' header not found.")
+        # print("data:",data)
+
+
+        # Find and extract "Compounded Sales Growth" and "Compound Profit Growth" tables
+        for growth_type in ["Compounded Sales Growth", "Compounded Profit Growth"]:
+            growth_table = None
+            for table in soup.find_all('table', class_='ranges-table'):
+                header = table.find('th', colspan="2")
+                if header and header.get_text(strip=True) == growth_type:
+                    growth_table = table
+                    break
+
+            # Check if the table was found
+            if growth_table:
+                growth_data = {}
+                # Define the periods we're looking for
+                periods = ["10 Years:", "5 Years:", "3 Years:", "TTM:"]
+        
+                # Loop through each row in the table body
+                for row in growth_table.find_all('tr'):
+                    cells = row.find_all('td')
+
+                    # Check if the row has two cells and the first cell contains one of the periods we're looking for
+                    if len(cells) == 2 and cells[0].get_text(strip=True) in periods:
+                        # Get the period name and its corresponding value
+                        period = cells[0].get_text(strip=True)
+                        value = cells[1].get_text(strip=True)
+
+                        # Store the result in the dictionary with a prefix for identification
+                        prefixed_period = f"{growth_type} {period}"
+                        growth_data[prefixed_period] = value
+                        data[prefixed_period] = value
+
+                # Output the results
+                print(f"{growth_type}:")
+                for period, value in growth_data.items():
+                    print(f"{period} {value}")
+
+            else:
+                print(f"Table with '{growth_type}' header not found.")
+
+        # Print the final data dictionary to verify
+        print("data:", data)
+
 
     except requests.RequestException as e:
         print(f"Error fetching standalone data: {e}")
